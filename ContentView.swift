@@ -139,12 +139,25 @@ struct ContentView: View {
     }
 }
 
+
+struct HomePage: View {
+    var body: some View{
+        VStack{
+            Spacer()
+            Text("Hey")
+                .foregroundStyle(Color.white)
+            Spacer()
+        }
+    }
+}
+
 struct ProfileView: View {
     @State private var typedText = ""
     @State private var showCard = false
     @State private var dragOffset = CGSize.zero
     @State private var isVisible = false
     @State private var textFinished = false
+    @State private var showHome = false
 
     let fullText = "Hey, I’m Nitish.\n\nI started exploring coding out of curiosity, and somewhere along the way it turned into something I genuinely enjoy.\n\nRight now, I’m diving into Swift and SwiftUI, experimenting, breaking things, fixing them, and learning a little more every day.\n\nI love figuring out how ideas turn into experiences, even if I don’t know all the answers yet.\n\nI’m always ready to learn something new, try unfamiliar things, and grow along the way.\n\nThis project is just one step in that ongoing journey."
 
@@ -172,7 +185,7 @@ struct ProfileView: View {
 
                 if textFinished {
                     Button {
-
+                        eraseText()
                     } label: {
                         Text("Next?")
                             .font(.system(.headline, design: .monospaced))
@@ -194,7 +207,10 @@ struct ProfileView: View {
                         }
                     }
                 }
-
+                if showHome{
+                    HomePage()
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                }
                 Spacer()
             }
             .frame(width: geo.size.width, height: geo.size.height)
@@ -212,10 +228,11 @@ struct ProfileView: View {
     func startTyping() {
         typedText = ""
         Task {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.prepare()
             for char in fullText {
-                try? await Task.sleep(nanoseconds: 80_000_000)
+                try? await Task.sleep(nanoseconds: 800_000)
                 typedText.append(char)
-                let generator = UIImpactFeedbackGenerator(style: .light)
                 generator.impactOccurred()
             }
             await MainActor.run {
@@ -223,7 +240,37 @@ struct ProfileView: View {
             }
         }
     }
+    func eraseText() {
+        Task {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.prepare()
+
+            while true {
+                try? await Task.sleep(nanoseconds: 30_000_000)
+
+                let didRemove = await MainActor.run { () -> Bool in
+                    guard !typedText.isEmpty else { return false }
+                    typedText.removeLast()
+                    return true
+                }
+
+                if didRemove {
+                    generator.impactOccurred()
+                } else {
+                    break
+                }
+            }
+
+            await MainActor.run {
+                textFinished = false
+                withAnimation(.easeInOut(duration: 1)) {
+                    showHome = true
+                }
+            }
+        }
+    }
 }
+
 
 struct LoadingBarView: View {
     @Binding var progress: CGFloat
