@@ -42,14 +42,12 @@ struct ContentView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             withAnimation(.easeInOut(duration: 2.0)) {
-                nucleusColor = Color(red: 0.1, green: 0.12, blue: 0.18)
+                nucleusColor = Color(.black)
             }
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-                showProfile = true
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            showProfile.toggle()
         }
     }
 
@@ -65,15 +63,16 @@ struct ContentView: View {
             let buttonHeight = size * 0.09
 
             ZStack {
-                Circle()
-                    .fill(nucleusColor)
-                    .frame(width: nucleusSize, height: nucleusSize)
-                    .scaleEffect(expandNucleus ? 50.0 : 1.0)
-                    .offset(y: -100)
-
+                Color(.black)
+                        .ignoresSafeArea()
                 VStack(spacing: 60){
                     if !showProfile {
                         ZStack {
+                            Circle()
+                                .fill(nucleusColor)
+                                .frame(width: nucleusSize, height: nucleusSize)
+                                .scaleEffect(expandNucleus ? 50.0 : 1.0)
+
                             Circle()
                                 .stroke(Color.gray.opacity(0.5), lineWidth: 2)
                                 .frame(width: atomSize, height: atomSize)
@@ -141,13 +140,41 @@ struct ContentView: View {
 
 
 struct HomePage: View {
-    var body: some View{
-        VStack{
-            Spacer()
-            Text("Hey")
-                .foregroundStyle(Color.white)
-            Spacer()
-        }
+    let lineHeight: CGFloat = 50
+    let spacing: CGFloat = 40
+    let speed: Double = 3
+
+    @State private var offset: CGFloat = 0
+
+    var body: some View {
+       GeometryReader { geo in
+           let totalHeight = geo.size.height
+           let patternHeight = lineHeight + spacing
+           let lineCount = Int(totalHeight)
+
+           ZStack {
+               Color(.black)
+                   .ignoresSafeArea()
+
+               VStack(spacing: spacing) {
+                   ForEach(0..<lineCount, id: \.self) { _ in
+                       Rectangle()
+                           .fill(Color.gray.opacity(0.15))
+                           .frame(height: lineHeight)
+                   }
+               }
+               .offset(y: offset)
+               .onAppear {
+                   offset = 0
+                   withAnimation(
+                       .linear(duration: speed)
+                       .repeatForever(autoreverses: false)
+                   ) {
+                       offset = patternHeight
+                   }
+               }
+           }
+       }
     }
 }
 
@@ -167,53 +194,63 @@ struct ProfileView: View {
             let buttonWidth = width * 0.45
             let buttonHeight = width * 0.12
 
-            VStack(spacing: 30) {
+            GeometryReader { geo in
+                ZStack{
+                    Color(.black)
+                            .ignoresSafeArea()
+                    ScrollView {
+                        VStack(spacing: 30) {
 
-                HStack {
-                    Text(typedText)
-                        .font(.system(.title3, design: .monospaced))
-                        .fontWeight(.bold)
-                        .foregroundColor(.green)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer()
-                }
-                .padding(.horizontal, 30)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                
-                Spacer()
+                            HStack {
+                                Text(typedText)
+                                    .font(.system(.title3, design: .monospaced))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.green)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 30)
 
-                if textFinished {
-                    Button {
-                        eraseText()
-                    } label: {
-                        Text("Next?")
-                            .font(.system(.headline, design: .monospaced))
-                            .foregroundColor(.green)
-                            .frame(width: buttonWidth, height: buttonHeight)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: buttonHeight / 2)
-                                    .stroke(.green, lineWidth: 2)
-                            )
-                            .opacity(isVisible ? 1.0 : 0.6)
-                            .scaleEffect(isVisible ? 1.0 : 0.85)
-                    }
-                    .onAppear {
-                        withAnimation(
-                            .easeInOut(duration: 1.0)
-                            .repeatForever(autoreverses: true)
-                        ) {
-                            isVisible.toggle()
+                            Spacer()
+
+                            if textFinished {
+                                Button {
+                                    eraseText()
+                                } label: {
+                                    Text("Next?")
+                                        .font(.system(.headline, design: .monospaced))
+                                        .foregroundColor(.green)
+                                        .frame(width: buttonWidth, height: buttonHeight)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: buttonHeight / 2)
+                                                .stroke(.green, lineWidth: 2)
+                                        )
+                                        .opacity(isVisible ? 1.0 : 0.6)
+                                        .scaleEffect(isVisible ? 1.0 : 0.85)
+                                }
+                                .onAppear {
+                                    withAnimation(
+                                        .easeInOut(duration: 1.0)
+                                        .repeatForever(autoreverses: true)
+                                    ) {
+                                        isVisible.toggle()
+                                    }
+                                }
+                            }
+
+                            if showHome {
+                                HomePage()
+                                    .transition(.scale(scale: 0.8).combined(with: .opacity))
+                            }
+
+                            Spacer()
                         }
+                        .padding(.top, geo.safeAreaInsets.top)
+                        .frame(width: geo.size.width)
                     }
                 }
-                if showHome{
-                    HomePage()
-                        .transition(.scale(scale: 0.8).combined(with: .opacity))
-                }
-                Spacer()
             }
-            .frame(width: geo.size.width, height: geo.size.height)
+
         }
         .onAppear {
             startTyping()
@@ -241,12 +278,13 @@ struct ProfileView: View {
         }
     }
     func eraseText() {
+        textFinished = false
         Task {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.prepare()
 
             while true {
-                try? await Task.sleep(nanoseconds: 30_000_000)
+                try? await Task.sleep(nanoseconds: 5_000_000)
 
                 let didRemove = await MainActor.run { () -> Bool in
                     guard !typedText.isEmpty else { return false }
@@ -263,7 +301,7 @@ struct ProfileView: View {
 
             await MainActor.run {
                 textFinished = false
-                withAnimation(.easeInOut(duration: 1)) {
+                withAnimation(.easeInOut(duration: 2)) {
                     showHome = true
                 }
             }
@@ -291,4 +329,8 @@ struct LoadingBarView: View {
         }
         .frame(height: 20)
     }
+}
+
+#Preview(){
+    HomePage()
 }
