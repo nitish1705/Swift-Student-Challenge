@@ -137,45 +137,80 @@ struct ContentView: View {
         }
     }
 }
-
+import SwiftUI
 
 struct HomePage: View {
-    let lineHeight: CGFloat = 50
-    let spacing: CGFloat = 40
-    let speed: Double = 3
+    var body: some View {
+        GeometryReader { geo in
+            let screenHeight = UIScreen.main.bounds.height
+            let screenWidth = UIScreen.main.bounds.width
 
-    @State private var offset: CGFloat = 0
+            ZStack {
+                Color.black
+                    .ignoresSafeArea()
+
+                VStack(spacing: 50) {
+                    CardView(
+                        width: screenWidth * 0.6,
+                        height: screenHeight * 0.3
+                    )
+
+                    CardView(
+                        width: screenWidth * 0.6,
+                        height: screenHeight * 0.3
+                    )
+                }
+                .ignoresSafeArea()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+}
+
+struct CardView: View {
+    let width: CGFloat
+    let height: CGFloat
+
+    private var titleFontSize: CGFloat {
+        let base = width * 0.07   
+        return min(max(base, 22), 42)
+    }
 
     var body: some View {
-       GeometryReader { geo in
-           let totalHeight = geo.size.height
-           let patternHeight = lineHeight + spacing
-           let lineCount = Int(totalHeight)
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(Color.clear)
+                .overlay(
+                    Image("BGImage")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill),
+                    alignment: .top
+                )
+                .frame(width: width, height: height * 0.8)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 20,
+                        topTrailingRadius: 20
+                    )
+                )
 
-           ZStack {
-               Color(.black)
-                   .ignoresSafeArea()
+            Spacer(minLength: 0)
 
-               VStack(spacing: spacing) {
-                   ForEach(0..<lineCount, id: \.self) { _ in
-                       Rectangle()
-                           .fill(Color.gray.opacity(0.15))
-                           .frame(height: lineHeight)
-                   }
-               }
-               .offset(y: offset)
-               .onAppear {
-                   offset = 0
-                   withAnimation(
-                       .linear(duration: speed)
-                       .repeatForever(autoreverses: false)
-                   ) {
-                       offset = patternHeight
-                   }
-               }
-           }
-       }
+            Text("Hey! I’m Nitish.")
+                .font(.system(size: titleFontSize, weight: .bold))
+                .foregroundStyle(.white)
+
+            Spacer()
+        }
+        .frame(width: width, height: height)
+        .background(Color.gray.opacity(0.3))
+        .cornerRadius(20)
     }
+}
+
+
+#Preview{
+    HomePage()
 }
 
 struct ProfileView: View {
@@ -329,8 +364,4 @@ struct LoadingBarView: View {
         }
         .frame(height: 20)
     }
-}
-
-#Preview(){
-    HomePage()
 }
