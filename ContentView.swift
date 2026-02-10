@@ -137,80 +137,126 @@ struct ContentView: View {
         }
     }
 }
-import SwiftUI
 
-struct HomePage: View {
-    var body: some View {
-        GeometryReader { geo in
-            let screenHeight = UIScreen.main.bounds.height
-            let screenWidth = UIScreen.main.bounds.width
+struct HomePage: View{
+    var body: some View{
+        
+    }
+}
 
-            ZStack {
-                Color.black
-                    .ignoresSafeArea()
-
-                VStack(spacing: 50) {
-                    CardView(
-                        width: screenWidth * 0.6,
-                        height: screenHeight * 0.3
-                    )
-
-                    CardView(
-                        width: screenWidth * 0.6,
-                        height: screenHeight * 0.3
-                    )
-                }
-                .ignoresSafeArea()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+struct ProfileView2: View{
+    @State private var typedText = ""
+    @State private var isTextFinished = false
+    @State private var nextPage = false
+    @State private var isVisible = false
+    @State private var showCard = false
+    
+    let screenWidth = UIScreen.main.bounds.width
+    let screenHeight = UIScreen.main.bounds.height
+    
+    let fullText = "Hey, I’m Nitish.\n\nI started exploring coding out of curiosity, and somewhere along the way it turned into something I genuinely enjoy.\n\nRight now, I’m diving into Swift and SwiftUI, experimenting, breaking things, fixing them, and learning a little more every day.\n\nI love figuring out how ideas turn into experiences, even if I don’t know all the answers yet.\n\nI’m always ready to learn something new, try unfamiliar things, and grow along the way.\n\nThis project is just one step in that ongoing journey."
+    
+    func startTyping() {
+        typedText = ""
+        Task {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.prepare()
+            for char in fullText {
+                try? await Task.sleep(nanoseconds: 800_000)
+                typedText.append(char)
+                generator.impactOccurred()
+            }
+            await MainActor.run {
+                isTextFinished = true
             }
         }
     }
-}
+    func eraseText() {
+        isTextFinished = false
+        Task {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.prepare()
 
-struct CardView: View {
-    let width: CGFloat
-    let height: CGFloat
+            while true {
+                try? await Task.sleep(nanoseconds: 5_000_000)
 
-    private var titleFontSize: CGFloat {
-        let base = width * 0.07   
-        return min(max(base, 22), 42)
-    }
+                let didRemove = await MainActor.run { () -> Bool in
+                    guard !typedText.isEmpty else { return false }
+                    typedText.removeLast()
+                    return true
+                }
 
-    var body: some View {
-        VStack(spacing: 0) {
-            Rectangle()
-                .fill(Color.clear)
-                .overlay(
-                    Image("BGImage")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill),
-                    alignment: .top
-                )
-                .frame(width: width, height: height * 0.8)
-                .clipShape(
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 20,
-                        topTrailingRadius: 20
-                    )
-                )
+                if didRemove {
+                    generator.impactOccurred()
+                } else {
+                    break
+                }
+            }
 
-            Spacer(minLength: 0)
-
-            Text("Hey! I’m Nitish.")
-                .font(.system(size: titleFontSize, weight: .bold))
-                .foregroundStyle(.white)
-
-            Spacer()
+            await MainActor.run {
+                isTextFinished = false
+                withAnimation(.easeInOut(duration: 2)) {
+                    nextPage = true
+                }
+            }
         }
-        .frame(width: width, height: height)
-        .background(Color.gray.opacity(0.3))
-        .cornerRadius(20)
     }
-}
+    var body: some View{
+        ZStack{
+            let buttonWidth = screenWidth * 0.45
+            let buttonHeight = screenWidth * 0.12
+            Color.black.ignoresSafeArea()
+            
+            VStack{
+                HStack{
+                    Text(typedText)
+                        .font(.system(.title3, design: .monospaced))
+                        .fontWeight(.bold)
+                        .foregroundStyle(Color.green)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 30)
+                Spacer()
+                if(isTextFinished){
+                    Button{
+                        nextPage = false
+                        eraseText()
+                    } label: {
+                        Text("Next?")
+                            .font(.system(.headline, design: .monospaced))
+                            .foregroundColor(.green)
+                            .frame(width: buttonWidth, height: buttonHeight)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: buttonHeight / 2)
+                                    .stroke(.green, lineWidth: 2)
+                            )
+                            .opacity(isVisible ? 1.0 : 0.6)
+                            .scaleEffect(isVisible ? 1.0 : 0.85)
+                    }
+                    .onAppear{
+                        withAnimation(
+                            .easeInOut(duration: 1.0)
+                            .repeatForever(autoreverses: true)
+                        ){
+                            isVisible.toggle()
+                        }
+                    }
+                }
+                Spacer()
+            }
+            .frame(maxWidth: .infinity)
+            .safeAreaInset(edge: .top) {
+                Color.clear.frame(height: 0)
+            }
 
-
-#Preview{
-    HomePage()
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0){
+                startTyping()
+            }
+        }
+        
+    }
 }
 
 struct ProfileView: View {
@@ -273,15 +319,15 @@ struct ProfileView: View {
                                 }
                             }
 
-                            if showHome {
-                                HomePage()
-                                    .transition(.scale(scale: 0.8).combined(with: .opacity))
-                            }
-
                             Spacer()
                         }
                         .padding(.top, geo.safeAreaInsets.top)
                         .frame(width: geo.size.width)
+                    }
+                    
+                    if showHome {
+                        ProfileView2()
+                            .transition(.scale(scale: 0.8).combined(with: .opacity))
                     }
                 }
             }
@@ -289,11 +335,6 @@ struct ProfileView: View {
         }
         .onAppear {
             startTyping()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-                    showCard = true
-                }
-            }
         }
     }
 
