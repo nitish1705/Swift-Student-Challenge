@@ -154,7 +154,7 @@ struct ProfileView2: View{
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
-    let fullText = "Hey, I’m Nitish.\n\nI started exploring coding out of curiosity, and somewhere along the way it turned into something I genuinely enjoy.\n\nRight now, I’m diving into Swift and SwiftUI, experimenting, breaking things, fixing them, and learning a little more every day.\n\nI love figuring out how ideas turn into experiences, even if I don’t know all the answers yet.\n\nI’m always ready to learn something new, try unfamiliar things, and grow along the way.\n\nThis project is just one step in that ongoing journey."
+    let fullText = "\nI should probably start with an introduction.\n\n Hey, I’m Nitish.\n\nI started coding out of curiosity, and along the way it became something I genuinely enjoy.\n\nI like exploring unfamiliar ideas, learning from mistakes, and growing through building.\n\nI don’t know everything yet, but I’m always ready to learn, experiment, and move forward.\n\nThis project is just one step in that ongoing journey.\n"
     
     func startTyping() {
         typedText = ""
@@ -267,8 +267,7 @@ struct ProfileView: View {
     @State private var textFinished = false
     @State private var showHome = false
 
-    let fullText = "Hey, I’m Nitish.\n\nI started exploring coding out of curiosity, and somewhere along the way it turned into something I genuinely enjoy.\n\nRight now, I’m diving into Swift and SwiftUI, experimenting, breaking things, fixing them, and learning a little more every day.\n\nI love figuring out how ideas turn into experiences, even if I don’t know all the answers yet.\n\nI’m always ready to learn something new, try unfamiliar things, and grow along the way.\n\nThis project is just one step in that ongoing journey."
-
+    let fullText = "This project grew out of experimentation.\n It’s the result of trying things, breaking them, fixing them, and learning how ideas slowly turn into experiences.\n\nI’m currently exploring Swift and SwiftUI, learning by building rather than waiting to feel ready.\n\nI enjoy the process of figuring things out.\n Watching small design and logic choices change how an app feels.\n\nEven when I don’t have all the answers, I like moving forward, asking better questions, and improving step by step.\n\nThis project isn’t an endpoint.\nIt’s simply a snapshot of where I am right now—curious, learning, and evolving.\n"
     var body: some View {
         GeometryReader { geo in
             let width = geo.size.width
