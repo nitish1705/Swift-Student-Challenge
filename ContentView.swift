@@ -121,9 +121,9 @@ struct ContentView: View {
         particles.append(ContentParticle(
             x: CGFloat.random(in: 0...width),
             y: height + 10,
-            opacity: Double.random(in: 0.1...0.4),
+            opacity: Double.random(in: 0.15...0.5),
             size: CGFloat.random(in: 1.5...3.0),
-            speed: CGFloat.random(in: 0.3...1.0)
+            speed: CGFloat.random(in: 0.8...2.5)
         ))
     }
 
@@ -131,7 +131,7 @@ struct ContentView: View {
         particles = particles.compactMap { p in
             var u = p
             u.y -= u.speed
-            u.opacity -= 0.003
+            u.opacity -= 0.0008
             return (u.y < -20 || u.opacity <= 0) ? nil : u
         }
     }
@@ -258,8 +258,6 @@ struct ContentView: View {
         }
     }
 }
-
-import SwiftUI
 
 // MARK: - Window Identity
 
@@ -1123,9 +1121,9 @@ struct HomePage: View {
         particles.append(HomeParticle(
             x: CGFloat.random(in: 0...width),
             y: height + 10,
-            opacity: Double.random(in: 0.1...0.4),
+            opacity: Double.random(in: 0.15...0.5),
             size: CGFloat.random(in: 1.5...3.0),
-            speed: CGFloat.random(in: 0.3...1.0)
+            speed: CGFloat.random(in: 0.8...2.5)
         ))
     }
 
@@ -1133,7 +1131,7 @@ struct HomePage: View {
         particles = particles.compactMap { p in
             var u = p
             u.y -= u.speed
-            u.opacity -= 0.003
+            u.opacity -= 0.0008
             return (u.y < -20 || u.opacity <= 0) ? nil : u
         }
     }
