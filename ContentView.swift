@@ -176,12 +176,6 @@ struct ContentView: View {
                                 .frame(width: atomSize, height: atomSize)
                                 .opacity(showOrbit ? 1.0 : 0.0)
 
-                            Circle()
-                                .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                                .frame(width: atomSize * 0.7, height: atomSize * 0.7)
-                                .rotationEffect(.degrees(45))
-                                .opacity(showOrbit ? 1.0 : 0.0)
-
                             // Electrons
                             Group {
                                 Circle().fill(Color.blue)
@@ -363,17 +357,18 @@ struct HomePage: View {
     }
 
     let skills: [SkillItem] = [
-        .init(icon: "swift", name: "Swift", color: .orange, level: 0.8),
-        .init(icon: "apple.logo", name: "SwiftUI", color: .blue, level: 0.75),
-        .init(icon: "server.rack", name: "Backend", color: .green, level: 0.5),
-        .init(icon: "paintbrush.pointed.fill", name: "UI/UX", color: .purple, level: 0.7),
+        .init(icon: "swift", name: "Swift", color: .orange, level: 0.85),
+        .init(icon: "apple.logo", name: "SwiftUI", color: .blue, level: 0.80),
+        .init(icon: "database.fill", name: "SwiftData", color: .green, level: 0.75),
+        .init(icon: "cup.and.saucer.fill", name: "Java", color: .red, level: 0.85),
+        .init(icon: "c.square.fill", name: "C", color: .purple, level: 0.75)
     ]
 
     let projects: [ProjectItem] = [
-        .init(title: "Atom Loader", description: "An atom-inspired animated loading screen with orbital electron paths.", icon: "atom", gradient: [.cyan, .blue]),
-        .init(title: "Portfolio App", description: "This interactive portfolio built entirely in SwiftUI.", icon: "iphone.gen3", gradient: [.purple, .pink]),
-        .init(title: "Type Engine", description: "Terminal-style typewriter text engine with haptic feedback.", icon: "keyboard.fill", gradient: [.green, .mint]),
-        .init(title: "Experiments", description: "SwiftUI animation experiments pushing creative boundaries.", icon: "flask.fill", gradient: [.orange, .yellow]),
+        .init(title: "CodeSnippet", description: "A SwiftUI-based mini IDE for organizing reusable code snippets with folder-based structure.", icon: "chevron.left.forwardslash.chevron.right", gradient: [.cyan, .blue]),
+        .init(title: "GPACALC", description: "An academic utility application to calculate GPA and CGPA with persistent storage.", icon: "graduationcap.fill", gradient: [.green, .mint]),
+        .init(title: "Portfolio App", description: "An interactive portfolio built entirely in SwiftUI.", icon: "person.crop.circle.fill", gradient: [.purple, .pink]),
+        .init(title: "Password Generator", description: "A cybersecurity utility built to handle password complexity and encryption.", icon: "key.fill", gradient: [.orange, .red])
     ]
 
     var body: some View {
@@ -1145,7 +1140,7 @@ struct ProfileView: View {
     @State private var isVisible = false
     @State private var showNextPage = false
 
-    let fullText = "This project grew out of experimentation.\n It's the result of trying things, breaking them, fixing them, and learning how ideas slowly turn into experiences.\n\nI'm currently exploring Swift and SwiftUI, learning by building rather than waiting to feel ready.\n\nI enjoy the process of figuring things out.\n Watching small design and logic choices change how an app feels.\n\nEven when I don't have all the answers, I like moving forward, asking better questions, and improving step by step.\n\nThis project isn't an endpoint.\nIt's simply a snapshot of where I am right now—curious, learning, and evolving.\n"
+    let fullText = "This project grew out of experimentation.\n It's the result of trying things, breaking them, fixing them, and learning how ideas slowly turn into experiences.\n\nI'm currently exploring Swift and SwiftUI, learning by building rather than waiting to feel ready.\n\nI enjoy the process of figuring things out.\n Watching small design and logic choices change how an app feels.\n\nThis project isn't an endpoint.\nIt's simply a snapshot of where I am right now—curious, learning, and evolving.\n"
 
     var body: some View {
         GeometryReader { geo in
