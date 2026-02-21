@@ -419,7 +419,6 @@ struct HomePage: View {
                     Spacer()
                     if showDock {
                         ZStack(alignment: .top) {
-                            // Tooltip floats above dock
                             if let hoveredID = dockHover {
                                 dockTooltip(for: hoveredID)
                                     .offset(y: -52)
