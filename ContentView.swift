@@ -139,115 +139,109 @@ struct ContentView: View {
     // MARK: - Body
 
     var body: some View {
-        GeometryReader { geo in
-            let width = geo.size.width
-            let height = geo.size.height
-            let size = min(width, height)
-            let atomSize = size * 0.5
-            let nucleusSize = atomSize * 0.2
-            let electronSize = atomSize * 0.1
-            let orbitRadius = atomSize * 0.5
-
-            let buttonWidth = size * 0.3
-            let buttonHeight = size * 0.09
-
-            ZStack {
-                // ── Live mesh gradient background ──
-                meshBackground
-                    .ignoresSafeArea()
-
-                // ── Floating particles ──
-                particleLayer(width: width, height: height)
-
-                // ── Main atom + controls ──
-                VStack(spacing: 60) {
-                    if !showProfile {
-                        ZStack {
-                            // Nucleus — always present, scales up to fill screen
-                            Circle()
-                                .fill(nucleusColor)
-                                .frame(width: nucleusSize, height: nucleusSize)
-                                .scaleEffect(expandNucleus ? 50.0 : 1.0)
-                                .shadow(color: nucleusColor.opacity(expandNucleus ? 0 : 0.6), radius: 12)
-
-                            // Orbit rings — hide when disappearing
-                            Circle()
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1.5)
-                                .frame(width: atomSize, height: atomSize)
-                                .opacity(showOrbit ? 1.0 : 0.0)
-
-                            // Electrons
-                            Group {
-                                Circle().fill(Color.blue)
-                                    .shadow(color: .blue.opacity(0.7), radius: 8)
-                                    .offset(y: -orbitRadius)
-                                    .opacity(showBlue ? 1.0 : 0.0)
-
-                                Circle().fill(Color.green)
-                                    .shadow(color: .green.opacity(0.7), radius: 8)
-                                    .offset(y: orbitRadius)
-                                    .opacity(showGreen ? 1.0 : 0.0)
-
-                                Circle().fill(Color.red)
-                                    .shadow(color: .red.opacity(0.7), radius: 8)
-                                    .offset(x: orbitRadius)
-                                    .opacity(showRed ? 1.0 : 0.0)
-
-                                Circle().fill(Color.yellow)
-                                    .shadow(color: .yellow.opacity(0.7), radius: 8)
-                                    .offset(x: -orbitRadius)
-                                    .opacity(showYellow ? 1.0 : 0.0)
+        if #available(iOS 17.0, *) {
+            GeometryReader { geo in
+                let width = geo.size.width
+                let height = geo.size.height
+                let size = min(width, height)
+                let atomSize = size * 0.5
+                let nucleusSize = atomSize * 0.2
+                let electronSize = atomSize * 0.1
+                let orbitRadius = atomSize * 0.5
+                
+                let buttonWidth = size * 0.3
+                let buttonHeight = size * 0.09
+                
+                ZStack {
+                    meshBackground
+                        .ignoresSafeArea()
+                    
+                    particleLayer(width: width, height: height)
+                    
+                    VStack(spacing: 60) {
+                        if !showProfile {
+                            ZStack {
+                                Circle()
+                                    .fill(nucleusColor)
+                                    .frame(width: nucleusSize, height: nucleusSize)
+                                    .scaleEffect(expandNucleus ? 50.0 : 1.0)
+                                    .shadow(color: nucleusColor.opacity(expandNucleus ? 0 : 0.6), radius: 12)
+                                
+                                Circle()
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1.5)
+                                    .frame(width: atomSize, height: atomSize)
+                                    .opacity(showOrbit ? 1.0 : 0.0)
+                                
+                                Group {
+                                    Circle().fill(Color.blue)
+                                        .shadow(color: .blue.opacity(0.7), radius: 8)
+                                        .offset(y: -orbitRadius)
+                                        .opacity(showBlue ? 1.0 : 0.0)
+                                    
+                                    Circle().fill(Color.green)
+                                        .shadow(color: .green.opacity(0.7), radius: 8)
+                                        .offset(y: orbitRadius)
+                                        .opacity(showGreen ? 1.0 : 0.0)
+                                    
+                                    Circle().fill(Color.red)
+                                        .shadow(color: .red.opacity(0.7), radius: 8)
+                                        .offset(x: orbitRadius)
+                                        .opacity(showRed ? 1.0 : 0.0)
+                                    
+                                    Circle().fill(Color.yellow)
+                                        .shadow(color: .yellow.opacity(0.7), radius: 8)
+                                        .offset(x: -orbitRadius)
+                                        .opacity(showYellow ? 1.0 : 0.0)
+                                }
+                                .frame(width: electronSize, height: electronSize)
+                                .rotationEffect(.degrees(isRotating ? 360 : 0))
                             }
-                            .frame(width: electronSize, height: electronSize)
-                            .rotationEffect(.degrees(isRotating ? 360 : 0))
+                            .frame(width: atomSize, height: atomSize)
                         }
-                        .frame(width: atomSize, height: atomSize)
-                    }
-
-                    if !expandNucleus {
-                        LoadingBarView(progress: $loadingProgress)
-                            .padding(.horizontal, 40)
-                            .opacity(loadingProgress == 1.0 ? 0 : 1.0)
-
-                        Button("Start Journey") {
-                            startFakeLoading()
-                        }
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .frame(width: buttonWidth, height: buttonHeight)
-                        .background(
-                            LinearGradient(
-                                colors: [.blue, .cyan.opacity(0.8)],
-                                startPoint: .leading,
-                                endPoint: .trailing
+                        
+                        if !expandNucleus {
+                            LoadingBarView(progress: $loadingProgress)
+                                .padding(.horizontal, 40)
+                                .opacity(loadingProgress == 1.0 ? 0 : 1.0)
+                            
+                            Button("Start Journey") {
+                                startFakeLoading()
+                            }
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .frame(width: buttonWidth, height: buttonHeight)
+                            .background(
+                                LinearGradient(
+                                    colors: [.blue, .cyan.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             )
-                        )
-                        .foregroundColor(.white)
-                        .cornerRadius(20)
-                        .shadow(color: .blue.opacity(0.4), radius: 12, y: 4)
-                        .opacity(loadingProgress > 0.0 ? 0.0 : 1.0)
-                        .disabled(loadingProgress > 0.0)
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                            .shadow(color: .blue.opacity(0.4), radius: 12, y: 4)
+                            .opacity(loadingProgress > 0.0 ? 0.0 : 1.0)
+                            .disabled(loadingProgress > 0.0)
+                        }
+                    }
+                    
+                    if showProfile {
+                        ProfileView()
+                            .transition(.scale(scale: 0.8).combined(with: .opacity))
                     }
                 }
-
-                if showProfile {
-                    ProfileView()
-                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onReceive(particleTimer) { _ in
+                    spawnParticle(width: width, height: height)
+                    updateParticles()
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onReceive(particleTimer) { _ in
-                spawnParticle(width: width, height: height)
-                updateParticles()
+            .onAppear {
+                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                    isRotating = true
+                }
             }
-        }
-        .onAppear {
-            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-                isRotating = true
-            }
-        }
-        .onChange(of: loadingProgress) { newValue in
-            if newValue >= 1.0 {
-                startDisappearing()
+            .onChange(of: loadingProgress) { oldValue, newValue in
+                if newValue >= 1.0 { startDisappearing() }
             }
         }
     }
@@ -350,7 +344,6 @@ struct HomePage: View {
     @State private var showMenuBar = false
     @State private var currentScreenSize: CGSize = .zero
 
-    // Fixed layout constants
     private let menuBarHeight: CGFloat = 36
     private let dockAreaHeight: CGFloat = 70
 
@@ -414,8 +407,6 @@ struct HomePage: View {
                             ))
                     }
                 }
-
-                // Menu bar
                 VStack {
                     if showMenuBar {
                         menuBar(width: size.width)
@@ -424,8 +415,6 @@ struct HomePage: View {
                     Spacer()
                 }
                 .zIndex(9999)
-
-                // Dock with tooltip overlay
                 VStack {
                     Spacer()
                     if showDock {
@@ -525,7 +514,6 @@ struct HomePage: View {
         let windowWidth = fs ? screenSize.width : winSize.width
         let windowHeight = fs ? screenSize.height : winSize.height
 
-        // Clamp the offset so window stays in bounds
         let baseOffset = CGSize(
             width: state.offset.width + state.dragOffset.width,
             height: state.offset.height + state.dragOffset.height
@@ -967,6 +955,10 @@ struct HomePage: View {
                 Divider().background(Color.white.opacity(0.1))
                 Text("No external dependencies. No APIs. No internet. Just Swift, SwiftUI, and late nights.")
                     .font(.system(size: 12, weight: .regular, design: .rounded)).foregroundColor(.white.opacity(0.45)).lineSpacing(4)
+                Text("Built from scratch for the Apple Swift Student Challenge — designed, coded, and polished within a tight deadline to showcase what's possible with pure SwiftUI.")
+                    .font(.system(size: 12, weight: .regular, design: .rounded)).foregroundColor(.white.opacity(0.45)).lineSpacing(4)
+                Text("This isn't the final form. The project will continue to evolve — new features, smoother interactions, and deeper content are all on the roadmap.")
+                    .font(.system(size: 12, weight: .regular, design: .rounded)).foregroundColor(.white.opacity(0.45)).lineSpacing(4)
             }
             Divider().background(Color.white.opacity(0.1))
             HStack(spacing: 5) {
@@ -984,7 +976,11 @@ struct HomePage: View {
             Image(systemName: "apple.logo").font(.system(size: 16)).foregroundColor(.white.opacity(0.8))
             Text("Nitish's Portfolio").font(.system(size: 13, weight: .semibold, design: .rounded)).foregroundColor(.white.opacity(0.8))
             Spacer()
-            Text("Sat Feb 14  9:41 AM").font(.system(size: 12, weight: .medium, design: .monospaced)).foregroundColor(.white.opacity(0.6))
+            TimelineView(.everyMinute) { context in
+                Text(context.date, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().hour().minute())
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.6))
+            }
         }
         .padding(.horizontal, 16).padding(.vertical, 8)
         .background(ZStack { Rectangle().fill(.ultraThinMaterial).environment(\.colorScheme, .dark); Rectangle().fill(Color.black.opacity(0.3)) })
@@ -1010,15 +1006,6 @@ struct HomePage: View {
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
                             .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                     }
-                )
-
-            // Triangle pointer
-            Triangle()
-                .fill(Color.black.opacity(0.55))
-                .frame(width: 14, height: 7)
-                .overlay(
-                    Triangle()
-                        .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                 )
         }
     }
@@ -1134,13 +1121,9 @@ struct HomePage: View {
         }, perform: {})
     }
 
-    // MARK: - Bring to Front
-
     private func bringToFront(_ id: WindowID) {
         topZ += 1; windows[id]?.zIndex = topZ
     }
-
-    // MARK: - Mesh Background
 
     private var meshBackground: some View {
         TimelineView(.animation) { timeline in
@@ -1188,18 +1171,6 @@ struct HomePage: View {
     }
 }
 
-// MARK: - Triangle Shape (for dock tooltip pointer)
-
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.closeSubpath()
-        return path
-    }
-}
 // MARK: - ProfileView (Page 1 → ProfileView2)
 
 struct ProfileView: View {
@@ -1282,7 +1253,7 @@ struct ProfileView: View {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.prepare()
             for char in fullText {
-                try? await Task.sleep(nanoseconds: 800_000)
+                try? await Task.sleep(nanoseconds: 8_000_000)
                 typedText.append(char)
                 generator.impactOccurred()
             }
@@ -1299,7 +1270,7 @@ struct ProfileView: View {
             generator.prepare()
 
             while true {
-                try? await Task.sleep(nanoseconds: 5_000_000)
+                try? await Task.sleep(nanoseconds: 1_000_000)
 
                 let didRemove = await MainActor.run { () -> Bool in
                     guard !typedText.isEmpty else { return false }
@@ -1342,49 +1313,51 @@ struct ProfileView2: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                VStack {
-                    HStack {
-                        Text(typedText)
-                            .font(.system(.title3, design: .monospaced))
-                            .fontWeight(.bold)
-                            .foregroundStyle(Color.green)
-                            .fixedSize(horizontal: false, vertical: true)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 30)
-
-                    Spacer()
-
-                    if isTextFinished {
-                        Button {
-                            eraseText()
-                        } label: {
-                            Text("Next?")
-                                .font(.system(.headline, design: .monospaced))
-                                .foregroundColor(.green)
-                                .frame(width: buttonWidth, height: buttonHeight)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: buttonHeight / 2)
-                                        .stroke(.green, lineWidth: 2)
-                                )
-                                .opacity(isVisible ? 1.0 : 0.6)
-                                .scaleEffect(isVisible ? 1.0 : 0.85)
+                ScrollView{
+                    VStack {
+                        HStack {
+                            Text(typedText)
+                                .font(.system(.title3, design: .monospaced))
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color.green)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer()
                         }
-                        .onAppear {
-                            withAnimation(
-                                .easeInOut(duration: 1.0)
-                                .repeatForever(autoreverses: true)
-                            ) {
-                                isVisible.toggle()
+                        .padding(.horizontal, 30)
+
+                        Spacer()
+
+                        if isTextFinished {
+                            Button {
+                                eraseText()
+                            } label: {
+                                Text("Next?")
+                                    .font(.system(.headline, design: .monospaced))
+                                    .foregroundColor(.green)
+                                    .frame(width: buttonWidth, height: buttonHeight)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: buttonHeight / 2)
+                                            .stroke(.green, lineWidth: 2)
+                                    )
+                                    .opacity(isVisible ? 1.0 : 0.6)
+                                    .scaleEffect(isVisible ? 1.0 : 0.85)
+                            }
+                            .onAppear {
+                                withAnimation(
+                                    .easeInOut(duration: 1.0)
+                                    .repeatForever(autoreverses: true)
+                                ) {
+                                    isVisible.toggle()
+                                }
                             }
                         }
-                    }
 
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .safeAreaInset(edge: .top) {
-                    Color.clear.frame(height: 0)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .safeAreaInset(edge: .top) {
+                        Color.clear.frame(height: 0)
+                    }
                 }
 
                 if showHomePage {
@@ -1406,7 +1379,7 @@ struct ProfileView2: View {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.prepare()
             for char in fullText {
-                try? await Task.sleep(nanoseconds: 800_000)
+                try? await Task.sleep(nanoseconds: 8_000_000)
                 typedText.append(char)
                 generator.impactOccurred()
             }
@@ -1423,7 +1396,7 @@ struct ProfileView2: View {
             generator.prepare()
 
             while true {
-                try? await Task.sleep(nanoseconds: 5_000_000)
+                try? await Task.sleep(nanoseconds: 1_000_000)
 
                 let didRemove = await MainActor.run { () -> Bool in
                     guard !typedText.isEmpty else { return false }
